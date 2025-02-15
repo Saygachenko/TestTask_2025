@@ -92,7 +92,7 @@ void UTT2025CharacterMovementComponent::PhysSlide(float DeltaTime, int32 Iterati
 
 	FVector OldLocation = UpdatedComponent->GetComponentLocation();
 	const FVector DeltaVelocity = Velocity * DeltaTime;
-	const FVector PlaneDirection = FVector::VectorPlaneProject(Velocity, HitResult.Normal).GetSafeNormal();
+	const FVector PlaneDirection = FVector::VectorPlaneProject(UpdatedComponent->GetForwardVector(), HitResult.Normal).GetSafeNormal();
 	FQuat NewRotation = FRotationMatrix::MakeFromXZ(PlaneDirection, HitResult.Normal).ToQuat();
 	HitResult = FHitResult(1.f);
 	SafeMoveUpdatedComponent(DeltaVelocity, NewRotation, true, HitResult);
