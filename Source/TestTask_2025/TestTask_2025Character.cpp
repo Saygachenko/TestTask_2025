@@ -11,6 +11,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 
+#include "TT2025CharacterMovementComponent.h"
+
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -58,6 +60,8 @@ void ATestTask_2025Character::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	CharacterMovementComponent = GetCharacterMovement<UTT2025CharacterMovementComponent>();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -98,7 +102,9 @@ void ATestTask_2025Character::Move(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
+	GetCharacterMovement<UTT2025CharacterMovementComponent>();
+
+	if (Controller != nullptr && !CharacterMovementComponent->bBlockMovementInput)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
