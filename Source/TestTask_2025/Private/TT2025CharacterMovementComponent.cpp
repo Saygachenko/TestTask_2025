@@ -36,22 +36,8 @@ void UTT2025CharacterMovementComponent::UpdateCharacterStateBeforeMovement(float
 			FHitResult HitResut;
 			if (GetSurfecOnFloor(HitResut) && Velocity.Length() >= SlideSettings.MinSpeed)
 			{
-				// ѕолучаем направление взгл€да персонажа
-				FVector ForwardVector = UpdatedComponent->GetForwardVector();
-
-				// Ќормализуем вектор скорости и направление взгл€да
-				FVector VelocityDirection = Velocity.GetSafeNormal2D();
-				ForwardVector = ForwardVector.GetSafeNormal2D();
-
-				UE_LOG(LogTemp, Error, TEXT("VelocityDirection: %s, ForwardVector: %s"), *VelocityDirection.ToString(), *ForwardVector.ToString());
-
-				// ¬ычисл€ем угол между направлением движени€ и направлением взгл€да
-				float DotProduct = FVector::DotProduct(VelocityDirection, ForwardVector);
-
-				UE_LOG(LogTemp, Error, TEXT("DotProduct: %f"), DotProduct);
-
-				// ≈сли угол меньше определЄнного порога (например, 0.7), персонаж не движетс€ вперЄд
-				if (DotProduct >= 0.8f) // 0.7 - это примерное значение, можно настроить
+				float DotProduct = FVector::DotProduct(Velocity.GetSafeNormal2D(), UpdatedComponent->GetForwardVector().GetSafeNormal2D());
+				if (DotProduct >= 0.8f)
 				{
 					EnterSlide();
 				}
