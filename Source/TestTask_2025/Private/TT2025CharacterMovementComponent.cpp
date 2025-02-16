@@ -29,18 +29,38 @@ void UTT2025CharacterMovementComponent::PhysCustom(float DeltaTime, int32 Iterat
 
 void UTT2025CharacterMovementComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds)
 {
-	if (MovementMode == MOVE_Walking && bCanSlide && bWantsToSlide)
+	if (bCanSlide)
 	{
-		FHitResult HitResut;
-		if (GetSurfecOnFloor(HitResut) && Velocity.Length() > SlideSettings.MinSpeed)
+		if (MovementMode == MOVE_Walking && bWantsToSlide)
 		{
-			EnterSlide();
-		}
-	}
+			FHitResult HitResut;
+			if (GetSurfecOnFloor(HitResut) && Velocity.Length() >= SlideSettings.MinSpeed)
+			{
+				// ѕолучаем направление взгл€да персонажа
+				FVector ForwardVector = UpdatedComponent->GetForwardVector();
 
-	if (IsCustomMode(ECMovementMode::CMOVE_Slide) && !bCanSlide)
-	{
-		ExitSlide();
+				// Ќормализуем вектор скорости и направление взгл€да
+				FVector VelocityDirection = Velocity.GetSafeNormal2D();
+				ForwardVector = ForwardVector.GetSafeNormal2D();
+
+				UE_LOG(LogTemp, Error, TEXT("VelocityDirection: %s, ForwardVector: %s"), *VelocityDirection.ToString(), *ForwardVector.ToString());
+
+				// ¬ычисл€ем угол между направлением движени€ и направлением взгл€да
+				float DotProduct = FVector::DotProduct(VelocityDirection, ForwardVector);
+
+				UE_LOG(LogTemp, Error, TEXT("DotProduct: %f"), DotProduct);
+
+				// ≈сли угол меньше определЄнного порога (например, 0.7), персонаж не движетс€ вперЄд
+				if (DotProduct >= 0.8f) // 0.7 - это примерное значение, можно настроить
+				{
+					EnterSlide();
+				}
+			}
+			else
+			{
+				ExitSlide();
+			}
+		}
 	}
 
 	Super::UpdateCharacterStateBeforeMovement(DeltaSeconds);
@@ -92,7 +112,7 @@ void UTT2025CharacterMovementComponent::PhysSlide(float DeltaTime, int32 Iterati
 
 	FVector OldLocation = UpdatedComponent->GetComponentLocation();
 	const FVector DeltaVelocity = Velocity * DeltaTime;
-	const FVector PlaneDirection = FVector::VectorPlaneProject(UpdatedComponent->GetForwardVector(), HitResult.Normal).GetSafeNormal();
+	const FVector PlaneDirection = FVector::VectorPlaneProject(Velocity, HitResult.Normal).GetSafeNormal();
 	FQuat NewRotation = FRotationMatrix::MakeFromXZ(PlaneDirection, HitResult.Normal).ToQuat();
 	HitResult = FHitResult(1.f);
 	SafeMoveUpdatedComponent(DeltaVelocity, NewRotation, true, HitResult);
