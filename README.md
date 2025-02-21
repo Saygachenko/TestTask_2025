@@ -25,7 +25,7 @@ Shooting - LKM.
 Reloading - R.
 Movement - WASD.
 Acceleration - SHIFT.
-Slide - F.
+Slide - SHIFT + F.
 Change weapons - Q.
 Change camera - V.
 
